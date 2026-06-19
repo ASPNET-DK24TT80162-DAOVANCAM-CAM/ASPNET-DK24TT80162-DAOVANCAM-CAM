@@ -1,0 +1,61 @@
+﻿@model ShopManagement.Models.OrderDetailsViewModel
+
+@{
+    ViewBag.Title = "Chi ti\u1EBFt \u0111\u01A1n h\u00E0ng";
+    Layout = "~/Views/Shared/_ShopLayout.cshtml";
+}
+
+<div class="page-header d-flex justify-content-between align-items-center">
+    <div>
+        <h1 class="h3 mb-1">@Model.Order.OrderCode</h1>
+        <p class="text-muted mb-0">@Model.Order.CreatedAt.ToString("dd/MM/yyyy HH:mm") • @Model.Order.OrderStatus</p>
+    </div>
+    <a href="@Url.Action("Index", "Orders")" class="btn btn-outline-dark">Quay lại</a>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card dashboard-card">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Sản phẩm</th>
+                                <th>Phân loại</th>
+                                <th>SL</th>
+                                <th>Đơn giá</th>
+                                <th>Thành tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Order.Items)
+                            {
+                                <tr>
+                                    <td>@item.ProductName</td>
+                                    <td>@item.ColorName / @item.SizeName</td>
+                                    <td>@item.Quantity</td>
+                                    <td>@item.UnitPrice.ToString("N0")</td>
+                                    <td>@item.LineTotal.ToString("N0")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card form-card p-4">
+            <h2 class="h5 mb-3">Thông tin nhận hàng</h2>
+            <p class="mb-1"><strong>@Model.Order.ReceiverName</strong></p>
+            <p class="mb-1">@Model.Order.PhoneNumber</p>
+            <p class="mb-3">@Model.Order.ShippingAddress</p>
+            <hr />
+            <div class="d-flex justify-content-between"><span>Tạm tính</span><strong>@Model.Order.Subtotal.ToString("N0")</strong></div>
+            <div class="d-flex justify-content-between"><span>Phí vận chuyển</span><strong>@Model.Order.ShippingFee.ToString("N0")</strong></div>
+            <div class="d-flex justify-content-between mt-2"><span>Tổng cộng</span><strong>@Model.Order.TotalAmount.ToString("N0") VNĐ</strong></div>
+        </div>
+    </div>
+</div>
+

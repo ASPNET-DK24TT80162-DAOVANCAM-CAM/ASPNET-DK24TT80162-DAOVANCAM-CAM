@@ -1,0 +1,232 @@
+﻿@model ShopManagement.Models.CartPageViewModel
+@using System.Linq
+
+@{
+    ViewBag.Title = "Giỏ hàng";
+    Layout = "~/Views/Shared/_ShopLayout.cshtml";
+    var hasStockIssue = Model.Items.Any(item => item.ProductVariant.StockQuantity <= 0 || item.Quantity > item.ProductVariant.StockQuantity);
+}
+
+<div class="page-header d-flex justify-content-between align-items-center">
+    <div>
+        <h1 class="h3 mb-1">Giỏ hàng</h1>
+        <p class="text-muted mb-0">Kiểm tra số lượng trước khi thanh toán.</p>
+    </div>
+    <a href="@Url.Action("Products", "Store")" class="btn btn-outline-dark">Tiếp tục mua sắm</a>
+</div>
+
+<div id="cartRealtimeMessage" class="mb-3"></div>
+
+<div class="card dashboard-card">
+    <div class="card-body p-0">
+        @if (!Model.Items.Any())
+        {
+            <div class="p-4 text-center">
+                <h2 class="h5 mb-2">Giỏ hàng đang trống</h2>
+                <p class="text-muted mb-3">Bạn chưa có sản phẩm nào trong giỏ hàng.</p>
+                <a href="@Url.Action("Products", "Store")" class="btn btn-dark">Bắt đầu mua sắm</a>
+            </div>
+        }
+
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Sản phẩm</th>
+                        <th>Phân loại</th>
+                        <th>Đơn giá</th>
+                        <th>SL</th>
+                        <th>Thành tiền</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
+                    {
+                        var availableStock = item.ProductVariant.StockQuantity;
+                        var lineHasIssue = availableStock <= 0 || item.Quantity > availableStock;
+                        <tr id="cart-row-@item.Id" data-item-id="@item.Id">
+                            <td>
+                                <div>@item.ProductVariant.Product.Name</div>
+                                <small id="line-warning-@item.Id" class="@(lineHasIssue ? "text-danger" : (availableStock <= 3 ? "text-warning" : "d-none"))">
+                                    @if (lineHasIssue)
+                                    {
+                                        <text>Tồn kho hiện không đủ cho số lượng đã chọn.</text>
+                                    }
+                                    else if (availableStock <= 3)
+                                    {
+                                        <text>Sản phẩm sắp hết hàng (còn @availableStock).</text>
+                                    }
+                                </small>
+                            </td>
+                            <td>@item.ProductVariant.Color.Name / @item.ProductVariant.Size.Name</td>
+                            <td>@item.UnitPrice.ToString("N0")</td>
+                            <td>
+                                @using (Html.BeginForm("Update", "Cart", FormMethod.Post, new { @class = "d-flex gap-2 js-cart-update", data_ajax_url = Url.Action("UpdateQuantityAjax", "Cart") }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    @Html.Hidden("id", item.Id)
+                                    <input type="number" name="quantity" class="form-control form-control-sm" value="@item.Quantity" min="0" max="@Math.Max(availableStock, 0)" style="max-width:90px" />
+                                    <button type="submit" class="btn btn-sm btn-outline-dark">Cập nhật</button>
+                                }
+                            </td>
+                            <td><span id="line-total-@item.Id">@((item.Quantity * item.UnitPrice).ToString("N0")) VND</span></td>
+                            <td>
+                                @using (Html.BeginForm("Remove", "Cart", FormMethod.Post, new { @class = "js-cart-remove", data_ajax_url = Url.Action("RemoveAjax", "Cart") }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    @Html.Hidden("id", item.Id)
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Xóa</button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex justify-content-end mt-3">
+    <div class="card form-card p-3" style="min-width:320px">
+        <p class="mb-2">Tạm tính: <strong id="subtotalValue">@Model.Subtotal.ToString("N0") VND</strong></p>
+        @if (hasStockIssue)
+        {
+            <p id="stockIssueMessage" class="text-danger small mb-2">Vui lòng điều chỉnh lại số lượng trước khi thanh toán.</p>
+        }
+        else
+        {
+            <p id="stockIssueMessage" class="text-danger small mb-2 d-none">Vui lòng điều chỉnh lại số lượng trước khi thanh toán.</p>
+        }
+        @if (Model.Items.Any())
+        {
+            <a href="@Url.Action("Index", "Checkout")" class="@(hasStockIssue ? "btn btn-dark disabled" : "btn btn-dark")" aria-disabled="@(hasStockIssue ? "true" : "false")" id="checkoutButton">Tiến hành thanh toán</a>
+        }
+    </div>
+</div>
+
+@section scripts {
+<script>
+    (function () {
+        function showMessage(message, isError) {
+            var host = $('#cartRealtimeMessage');
+            if (!host.length) {
+                return;
+            }
+            var css = isError ? 'alert alert-danger' : 'alert alert-success';
+            host.html('<div class="' + css + '">' + message + '</div>');
+        }
+
+        function updateSummary(data) {
+            if (!data) {
+                return;
+            }
+
+            $('#subtotalValue').text(data.subtotalText || '0 VND');
+
+            var stockIssue = $('#stockIssueMessage');
+            var checkoutBtn = $('#checkoutButton');
+            if (data.hasStockIssue) {
+                stockIssue.removeClass('d-none');
+                checkoutBtn.addClass('disabled').attr('aria-disabled', 'true');
+            } else {
+                stockIssue.addClass('d-none');
+                checkoutBtn.removeClass('disabled').attr('aria-disabled', 'false');
+            }
+        }
+
+        $(document).on('submit', '.js-cart-update', function (e) {
+            e.preventDefault();
+            var form = $(this);
+            var ajaxUrl = form.data('ajax-url');
+            form.addClass('is-loading');
+            $.post(ajaxUrl, form.serialize())
+                .done(function (resp) {
+                    if (!resp || !resp.success) {
+                        showMessage(resp && resp.message ? resp.message : 'Kh\u00F4ng c\u1EADp nh\u1EADt \u0111\u01B0\u1EE3c gi\u1ECF h\u00E0ng.', true);
+                        form.removeClass('is-loading');
+                        return;
+                    }
+
+                    if (resp.removed) {
+                        $('#cart-row-' + resp.itemId).remove();
+                        updateSummary(resp);
+                        form.removeClass('is-loading');
+                        if (resp.itemCount === 0) {
+                            window.location.reload();
+                        }
+                        return;
+                    }
+
+                    $('#line-total-' + resp.itemId).text(resp.lineTotalText || '0 VND');
+
+                    var row = $('#cart-row-' + resp.itemId);
+                    row.find('input[name="quantity"]').attr('max', resp.stock).val(resp.quantity);
+
+                    var warning = $('#line-warning-' + resp.itemId);
+                    if (resp.warning) {
+                        warning.removeClass('d-none text-warning text-danger');
+                        if ((resp.stock || 0) <= 0 || (resp.quantity || 0) > (resp.stock || 0)) {
+                            warning.addClass('text-danger');
+                        } else {
+                            warning.addClass('text-warning');
+                        }
+                        warning.text(resp.warning);
+                    } else {
+                        warning.addClass('d-none').text('');
+                    }
+
+                    updateSummary(resp);
+                    showMessage('\u0110\u00E3 c\u1EADp nh\u1EADt gi\u1ECF h\u00E0ng.', false);
+                    form.removeClass('is-loading');
+                })
+                .fail(function () {
+                    showMessage('Kh\u00F4ng th\u1EC3 c\u1EADp nh\u1EADt gi\u1ECF h\u00E0ng l\u00FAc n\u00E0y.', true);
+                    form.removeClass('is-loading');
+                });
+        });
+
+        $(document).on('submit', '.js-cart-remove', function (e) {
+            e.preventDefault();
+            var form = $(this);
+            var ajaxUrl = form.data('ajax-url');
+            form.addClass('is-loading');
+            $.post(ajaxUrl, form.serialize())
+                .done(function (resp) {
+                    if (!resp || !resp.success) {
+                        showMessage(resp && resp.message ? resp.message : 'Kh\u00F4ng x\u00F3a \u0111\u01B0\u1EE3c s\u1EA3n ph\u1EA9m.', true);
+                        form.removeClass('is-loading');
+                        return;
+                    }
+
+                    $('#cart-row-' + resp.itemId).remove();
+                    updateSummary(resp);
+                    form.removeClass('is-loading');
+                    if (resp.itemCount === 0) {
+                        window.location.reload();
+                        return;
+                    }
+                    showMessage('\u0110\u00E3 x\u00F3a s\u1EA3n ph\u1EA9m kh\u1ECFi gi\u1ECF h\u00E0ng.', false);
+                })
+                .fail(function () {
+                    showMessage('Kh\u00F4ng th\u1EC3 x\u00F3a s\u1EA3n ph\u1EA9m l\u00FAc n\u00E0y.', true);
+                    form.removeClass('is-loading');
+                });
+        });
+
+        var qtyDebounceTimer = null;
+        $(document).on('change', '.js-cart-update input[name="quantity"]', function () {
+            var input = $(this);
+            var form = input.closest('form');
+
+            if (qtyDebounceTimer) {
+                clearTimeout(qtyDebounceTimer);
+            }
+
+            qtyDebounceTimer = setTimeout(function () {
+                form.trigger('submit');
+            }, 350);
+        });
+    })();
+</script>
+}

@@ -1,0 +1,13 @@
+﻿@{
+    ViewBag.Title = "Khu v\u1EF1c manager";
+    Layout = "~/Views/Shared/_ShopLayout.cshtml";
+}
+
+<div class="card dashboard-card">
+    <div class="card-body p-4">
+        <span class="badge text-bg-primary mb-3">Admin và Manager</span>
+        <h1 class="h3">Khu vực manager</h1>
+        <p class="text-muted">Manager và Admin có thể truy cập trang này. Chức năng cập nhật vai trò vẫn giới hạn cho Admin.</p>
+        <a href="@Url.Action("Index", "UserAdmin")" class="btn btn-primary">Mở danh sách người dùng</a>
+    </div>
+</div>

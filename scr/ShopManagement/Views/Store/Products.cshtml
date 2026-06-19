@@ -1,0 +1,231 @@
+﻿@model ShopManagement.Models.ProductListViewModel
+@using System.Linq
+
+@{
+    ViewBag.Title = "Danh s\u00E1ch s\u1EA3n ph\u1EA9m";
+    Layout = "~/Views/Shared/_ShopLayout.cshtml";
+    var selectedBrandIds = Model.SelectedBrandIds ?? new List<int>();
+    var selectedColorIds = Model.SelectedColorIds ?? new List<int>();
+    var selectedSizeIds = Model.SelectedSizeIds ?? new List<int>();
+    var brandQuery = string.Join(",", selectedBrandIds);
+    var colorQuery = string.Join(",", selectedColorIds);
+    var sizeQuery = string.Join(",", selectedSizeIds);
+}
+
+<div class="page-header">
+    <h1 class="h3 mb-1">Danh sách sản phẩm</h1>
+    <p class="text-muted mb-0">Tìm kiếm, lọc theo giá, size, màu, thương hiệu và sắp xếp kết quả.</p>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-3">
+        @using (Html.BeginForm("Products", "Store", FormMethod.Get, new { @class = "card form-card p-3" }))
+        {
+            <input type="hidden" name="page" value="1" />
+            <h2 class="h6 mb-3">Bộ lọc</h2>
+
+            <div class="mb-3">
+                <label class="form-label">Từ khóa</label>
+                <input type="text" name="q" class="form-control" value="@Model.QueryText" placeholder="Tên sản phẩm, SKU, thương hiệu..." />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Giới tính</label>
+                <select name="gender" class="form-select">
+                    <option value="">Tất cả</option>
+                    <option value="Men" @(Model.Gender == "Men" ? "selected" : "")>Nam</option>
+                    <option value="Women" @(Model.Gender == "Women" ? "selected" : "")>Nữ</option>
+                    <option value="Unisex" @(Model.Gender == "Unisex" ? "selected" : "")>Unisex</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Danh mục</label>
+                <select name="category" class="form-select">
+                    <option value="">Tất cả</option>
+                    @foreach (var category in Model.Categories)
+                    {
+                        <option value="@category.Id" @(Model.CategoryId == category.Id ? "selected" : "")>@category.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Thương hiệu</label>
+                <div class="border rounded-3 p-2" style="max-height:180px;overflow:auto;">
+                    @foreach (var brand in Model.Brands)
+                    {
+                        var checkedBrand = selectedBrandIds.Contains(brand.Id);
+                        <div class="form-check mb-1">
+                            <input class="form-check-input" type="checkbox" name="brand" id="brand_@brand.Id" value="@brand.Id" @(checkedBrand ? "checked" : "") />
+                            <label class="form-check-label" for="brand_@brand.Id">@brand.Name</label>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Màu sắc</label>
+                <div class="border rounded-3 p-2" style="max-height:160px;overflow:auto;">
+                    @foreach (var color in Model.Colors)
+                    {
+                        var checkedColor = selectedColorIds.Contains(color.Id);
+                        <div class="form-check mb-1">
+                            <input class="form-check-input" type="checkbox" name="color" id="color_@color.Id" value="@color.Id" @(checkedColor ? "checked" : "") />
+                            <label class="form-check-label" for="color_@color.Id">@color.Name</label>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Size</label>
+                <div class="border rounded-3 p-2" style="max-height:160px;overflow:auto;">
+                    @foreach (var size in Model.Sizes)
+                    {
+                        var checkedSize = selectedSizeIds.Contains(size.Id);
+                        <div class="form-check mb-1">
+                            <input class="form-check-input" type="checkbox" name="size" id="size_@size.Id" value="@size.Id" @(checkedSize ? "checked" : "") />
+                            <label class="form-check-label" for="size_@size.Id">@size.Name</label>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Khoảng giá nhanh</label>
+                <select name="pricePreset" class="form-select">
+                    <option value="" @(string.IsNullOrWhiteSpace(Model.PricePreset) ? "selected" : "")>Không chọn</option>
+                    <option value="under_500k" @(Model.PricePreset == "under_500k" ? "selected" : "")>Dưới 500.000</option>
+                    <option value="500k_1m" @(Model.PricePreset == "500k_1m" ? "selected" : "")>500.000 - 1.000.000</option>
+                    <option value="1m_2m" @(Model.PricePreset == "1m_2m" ? "selected" : "")>1.000.000 - 2.000.000</option>
+                    <option value="over_2m" @(Model.PricePreset == "over_2m" ? "selected" : "")>Trên 2.000.000</option>
+                </select>
+            </div>
+
+            <div class="row g-2 mb-3">
+                <div class="col-6">
+                    <label class="form-label">Giá min</label>
+                    <input type="number" class="form-control" name="minPrice" value="@Model.MinPrice" />
+                </div>
+                <div class="col-6">
+                    <label class="form-label">Giá max</label>
+                    <input type="number" class="form-control" name="maxPrice" value="@Model.MaxPrice" />
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Sắp xếp</label>
+                <select name="sort" class="form-select">
+                    <option value="relevance" @(Model.Sort == "relevance" ? "selected" : "")>Liên quan</option>
+                    <option value="best_selling" @(Model.Sort == "best_selling" ? "selected" : "")>Bán chạy</option>
+                    <option value="newest" @(Model.Sort == "newest" ? "selected" : "")>Mới nhất</option>
+                    <option value="price_asc" @(Model.Sort == "price_asc" ? "selected" : "")>Giá tăng dần</option>
+                    <option value="price_desc" @(Model.Sort == "price_desc" ? "selected" : "")>Giá giảm dần</option>
+                </select>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-dark w-100">Áp dụng</button>
+                <a href="@Url.Action("Products", "Store")" class="btn btn-outline-secondary">Xóa lọc</a>
+            </div>
+        }
+    </div>
+
+    <div class="col-lg-9">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+            <p class="text-muted mb-0">
+                Tìm thấy <strong>@Model.TotalItems</strong> sản phẩm
+                @if (!string.IsNullOrWhiteSpace(Model.QueryText))
+                {
+                    <span> với từ khóa "@Model.QueryText"</span>
+                }
+            </p>
+            <div class="d-flex align-items-center gap-2">
+                @using (Html.BeginForm("Products", "Store", FormMethod.Get, new { @class = "d-flex align-items-center gap-2" }))
+                {
+                    <input type="hidden" name="q" value="@Model.QueryText" />
+                    <input type="hidden" name="gender" value="@Model.Gender" />
+                    <input type="hidden" name="category" value="@Model.CategoryId" />
+                    <input type="hidden" name="minPrice" value="@Model.MinPrice" />
+                    <input type="hidden" name="maxPrice" value="@Model.MaxPrice" />
+                    <input type="hidden" name="pricePreset" value="@Model.PricePreset" />
+                    <input type="hidden" name="page" value="1" />
+
+                    foreach (var selectedBrandId in selectedBrandIds)
+                    {
+                        <input type="hidden" name="brand" value="@selectedBrandId" />
+                    }
+
+                    foreach (var selectedColorId in selectedColorIds)
+                    {
+                        <input type="hidden" name="color" value="@selectedColorId" />
+                    }
+
+                    foreach (var selectedSizeId in selectedSizeIds)
+                    {
+                        <input type="hidden" name="size" value="@selectedSizeId" />
+                    }
+
+                    <label class="small text-muted mb-0" for="sortTop">Sắp xếp</label>
+                    <select id="sortTop" name="sort" class="form-select form-select-sm" onchange="this.form.submit()">
+                        <option value="relevance" @(Model.Sort == "relevance" ? "selected" : "")>Liên quan</option>
+                        <option value="best_selling" @(Model.Sort == "best_selling" ? "selected" : "")>Bán chạy</option>
+                        <option value="newest" @(Model.Sort == "newest" ? "selected" : "")>Mới nhất</option>
+                        <option value="price_asc" @(Model.Sort == "price_asc" ? "selected" : "")>Giá tăng dần</option>
+                        <option value="price_desc" @(Model.Sort == "price_desc" ? "selected" : "")>Giá giảm dần</option>
+                    </select>
+                }
+                <span class="badge-soft">Trang @Model.Page / @Model.TotalPages</span>
+            </div>
+        </div>
+
+        @if (!Model.Products.Any())
+        {
+            <div class="card form-card p-4 text-center">
+                <h2 class="h5 mb-2">Không tìm thấy sản phẩm phù hợp</h2>
+                <p class="text-muted mb-3">Hãy thử đổi từ khóa hoặc mở rộng bộ lọc giá/thương hiệu/màu/size.</p>
+                <a href="@Url.Action("Products", "Store")" class="btn btn-outline-dark">Xem tất cả sản phẩm</a>
+            </div>
+        }
+
+        <div class="row g-3">
+            @foreach (var item in Model.Products)
+            {
+                <div class="col-sm-6 col-xl-4">
+                    <div class="card product-card h-100 border-0">
+                        <a href="@Url.Action("Details", "Store", new { slug = item.Slug })" class="text-decoration-none text-dark">
+                            <img src="@item.ThumbnailImage" class="card-img-top product-img" alt="@item.Name" />
+                        </a>
+                        <div class="card-body d-flex flex-column">
+                            <p class="small text-muted mb-1">@item.Brand.Name • @item.Category.Name</p>
+                            <h3 class="h6">@item.Name</h3>
+                            <p class="small text-muted mb-2">@item.ShortDescription</p>
+                            <div class="mt-auto d-flex justify-content-between align-items-center">
+                                <span class="fw-semibold">@((item.SalePrice ?? item.BasePrice).ToString("N0")) VNĐ</span>
+                                <div class="d-flex gap-2">
+                                    @using (Html.BeginForm("Add", "Wishlist", FormMethod.Post, new { @class = "d-inline-block" }))
+                                    {
+                                        @Html.AntiForgeryToken()
+                                        @Html.Hidden("productId", item.Id)
+                                        @Html.Hidden("returnUrl", Request.RawUrl)
+                                        <button type="submit" class="btn btn-sm btn-outline-secondary">Yêu thích</button>
+                                    }
+                                    <a href="@Url.Action("Details", "Store", new { slug = item.Slug })" class="btn btn-sm btn-dark">Xem</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="d-flex justify-content-center mt-4 gap-2 flex-wrap">
+            @for (var p = 1; p <= Model.TotalPages; p++)
+            {
+                <a class="btn btn-sm @(p == Model.Page ? "btn-dark" : "btn-outline-dark")" href="@Url.Action("Products", "Store", new { q = Model.QueryText, gender = Model.Gender, category = Model.CategoryId, brand = brandQuery, color = colorQuery, size = sizeQuery, minPrice = Model.MinPrice, maxPrice = Model.MaxPrice, pricePreset = Model.PricePreset, sort = Model.Sort, page = p })">@p</a>
+            }
+        </div>
+    </div>
+</div>
+

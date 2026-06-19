@@ -1,0 +1,42 @@
+@model IEnumerable<ShopManagement.Models.WishlistItem>
+
+@{
+    ViewBag.Title = "Yeu thich";
+    Layout = "~/Views/Shared/_ShopLayout.cshtml";
+}
+
+<div class="page-header d-flex justify-content-between align-items-center">
+    <div>
+        <h1 class="h3 mb-1">Danh sach yeu thich</h1>
+        <p class="text-muted mb-0">Cac san pham ban da luu de xem sau.</p>
+    </div>
+    @Html.ActionLink("Tiep tuc mua sam", "Products", "Store", null, new { @class = "btn btn-outline-dark" })
+</div>
+
+<div class="row g-3">
+    @foreach (var item in Model)
+    {
+        <div class="col-md-6">
+            <div class="card border-0 product-inline">
+                <div class="card-body d-flex gap-3 align-items-center">
+                    <img src="@item.Product.ThumbnailImage" class="product-inline-img rounded-3" alt="@item.Product.Name" />
+                    <div class="flex-grow-1">
+                        <h2 class="h6 mb-1">@item.Product.Name</h2>
+                        <p class="small text-muted mb-2">@item.Product.Brand.Name • @item.Product.Category.Name</p>
+                        <p class="mb-2 fw-semibold">@((item.Product.SalePrice ?? item.Product.BasePrice).ToString("N0")) VND</p>
+                        <div class="d-flex gap-2">
+                            <a href="@Url.Action("Details", "Store", new { slug = item.Product.Slug })" class="btn btn-sm btn-dark">Xem</a>
+                            @using (Html.BeginForm("Remove", "Wishlist", FormMethod.Post, new { @class = "d-inline-block" }))
+                            {
+                                @Html.AntiForgeryToken()
+                                @Html.Hidden("id", item.Id)
+                                @Html.Hidden("returnUrl", Request.RawUrl)
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Xoa</button>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

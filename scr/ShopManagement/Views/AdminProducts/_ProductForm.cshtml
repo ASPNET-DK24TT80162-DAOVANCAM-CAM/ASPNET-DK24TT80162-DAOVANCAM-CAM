@@ -1,0 +1,69 @@
+﻿@model ShopManagement.Models.Product
+
+<div class="card form-card p-4">
+    <div class="row g-3">
+        <div class="col-md-6">
+            @Html.LabelFor(model => model.Name, new { @class = "form-label" })
+            @Html.TextBoxFor(model => model.Name, new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger small" })
+        </div>
+        <div class="col-md-3">
+            @Html.LabelFor(model => model.Slug, new { @class = "form-label" })
+            @Html.TextBoxFor(model => model.Slug, new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.Slug, "", new { @class = "text-danger small" })
+        </div>
+        <div class="col-md-3">
+            @Html.LabelFor(model => model.Sku, new { @class = "form-label" })
+            @Html.TextBoxFor(model => model.Sku, new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.Sku, "", new { @class = "text-danger small" })
+        </div>
+        <div class="col-md-4">
+            @Html.LabelFor(model => model.BrandId, new { @class = "form-label" })
+            @Html.DropDownListFor(model => model.BrandId, (SelectList)ViewBag.BrandId, new { @class = "form-select" })
+        </div>
+        <div class="col-md-4">
+            @Html.LabelFor(model => model.CategoryId, new { @class = "form-label" })
+            @Html.DropDownListFor(model => model.CategoryId, (SelectList)ViewBag.CategoryId, new { @class = "form-select" })
+        </div>
+        <div class="col-md-4">
+            @Html.LabelFor(model => model.Gender, new { @class = "form-label" })
+            @Html.DropDownListFor(model => model.Gender, (SelectList)ViewBag.Gender, new { @class = "form-select" })
+        </div>
+        <div class="col-md-6">
+            @Html.LabelFor(model => model.BasePrice, new { @class = "form-label" })
+            @Html.TextBoxFor(model => model.BasePrice, new { @class = "form-control", type = "number", min = "0", step = "1000" })
+            @Html.ValidationMessageFor(model => model.BasePrice, "", new { @class = "text-danger small" })
+        </div>
+        <div class="col-md-6">
+            @Html.LabelFor(model => model.SalePrice, new { @class = "form-label" })
+            @Html.TextBoxFor(model => model.SalePrice, new { @class = "form-control", type = "number", min = "0", step = "1000" })
+            @Html.ValidationMessageFor(model => model.SalePrice, "", new { @class = "text-danger small" })
+        </div>
+        <div class="col-12">
+            @Html.LabelFor(model => model.ThumbnailImage, new { @class = "form-label" })
+            @Html.TextBoxFor(model => model.ThumbnailImage, new { @class = "form-control" })
+        </div>
+        <div class="col-12">
+            @Html.LabelFor(model => model.ShortDescription, new { @class = "form-label" })
+            @Html.TextBoxFor(model => model.ShortDescription, new { @class = "form-control" })
+        </div>
+        <div class="col-12">
+            @Html.LabelFor(model => model.Description, new { @class = "form-label" })
+            @Html.TextAreaFor(model => model.Description, new { @class = "form-control", rows = 4 })
+        </div>
+        <div class="col-12 d-flex gap-3">
+            <div class="form-check">
+                @Html.CheckBoxFor(model => model.IsFeatured, new { @class = "form-check-input" })
+                @Html.LabelFor(model => model.IsFeatured, new { @class = "form-check-label" })
+            </div>
+            <div class="form-check">
+                @Html.CheckBoxFor(model => model.IsActive, new { @class = "form-check-input" })
+                @Html.LabelFor(model => model.IsActive, new { @class = "form-check-label" })
+            </div>
+        </div>
+    </div>
+    <div class="mt-4 d-flex gap-2">
+        <button type="submit" class="btn btn-dark">Lưu</button>
+        <a href="@Url.Action("Index", "AdminProducts")" class="btn btn-outline-secondary">Quay lại</a>
+    </div>
+</div>

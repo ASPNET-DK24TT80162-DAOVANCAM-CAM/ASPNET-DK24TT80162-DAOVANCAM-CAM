@@ -1,0 +1,26 @@
+﻿<footer class="footer">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="brand mb-2" style="font-weight:700;font-size:1.2rem">STRIDE</div>
+                <p class="text-muted small">Nền tảng bán giày trực tuyến được tích hợp vào hệ thống ShopManagement MVC.</p>
+            </div>
+            <div class="col-md-4">
+                <h6>Mua sắm</h6>
+                <a href="@Url.Action("Products", "Store", new { gender = "Men" })">Giày nam</a>
+                <a href="@Url.Action("Products", "Store", new { gender = "Women" })">Giày nữ</a>
+                <a href="@Url.Action("Products", "Store")">Tất cả sản phẩm</a>
+            </div>
+            <div class="col-md-4">
+                <h6>Hỗ trợ</h6>
+                <a href="@Url.Action("Index", "Cart")">Giỏ hàng</a>
+                <a href="@Url.Action("Index", "Orders")">Đơn hàng</a>
+                <a href="@Url.Action("Profile", "Account")">Tài khoản</a>
+            </div>
+        </div>
+        <div class="legal">
+            <div>&copy; @DateTime.Now.Year STRIDE - ShopManagement MVC</div>
+        </div>
+    </div>
+</footer>
+

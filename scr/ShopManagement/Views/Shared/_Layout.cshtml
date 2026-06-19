@@ -1,0 +1,130 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Quản trị Shop</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+</head>
+<body class="app-shell">
+    @{ var isAdminOrManager = User.IsInRole("Admin") || User.IsInRole("Manager"); }
+    <nav class="navbar navbar-expand-lg navbar-dark app-nav shadow-sm">
+        <div class="container-fluid app-topbar py-2 px-3 px-lg-4">
+            @Html.ActionLink("ShopManagement", "Index", "Home", new { area = "" }, new { @class = "navbar-brand fw-semibold" })
+            <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#mainNav" title="Toggle navigation" aria-controls="mainNav"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("Index", "Home")">Trang chủ</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@Url.Action("Index", "Sales")">Bán hàng</a></li>
+                    @if (Request.IsAuthenticated)
+                    {
+                        <li class="nav-item"><a class="nav-link" href="@Url.Action("Dashboard", "Home")">Bảng điều khiển</a></li>
+                        <li class="nav-item"><a class="nav-link" href="@Url.Action("Profile", "Account")">Hồ sơ</a></li>
+                        <li class="nav-item"><a class="nav-link" href="@Url.Action("CustomerPanel", "Home")">Khu vực khách hàng</a></li>
+                    }
+                    @if (isAdminOrManager)
+                    {
+                        <li class="nav-item"><a class="nav-link" href="@Url.Action("Index", "UserAdmin")">Người dùng</a></li>
+                        <li class="nav-item"><a class="nav-link" href="@Url.Action("ManagerPanel", "Home")">Khu vực quản lý</a></li>
+                    }
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <li class="nav-item"><a class="nav-link" href="@Url.Action("AdminPanel", "Home")">Khu vực admin</a></li>
+                        <li class="nav-item"><a class="nav-link" href="@Url.Action("Index", "AdminProducts")">Sản phẩm</a></li>
+                    }
+                    @if (isAdminOrManager)
+                    {
+                        <li class="nav-item"><a class="nav-link" href="@Url.Action("Index", "AdminOrders")">Đơn hàng</a></li>
+                    }
+                </ul>
+                <div class="d-flex align-items-center gap-2 app-auth-actions">
+                    @if (Request.IsAuthenticated)
+                    {
+                        if (User.IsInRole("Admin"))
+                        {
+                            <a class="btn btn-warning btn-sm text-dark" href="@Url.Action("Dashboard", "Home")">Dashboard Admin</a>
+                        }
+                        <span class="navbar-text text-white-50 small">Welcome, @User.Identity.Name</span>
+                        <a class="btn btn-outline-light btn-sm" href="@Url.Action("Profile", "Account")">Mở Profile</a>
+                        using (@Html.BeginForm("Logout", "Account", FormMethod.Post, new { @class = "d-inline-block" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-outline-light btn-sm">Đăng xuất</button>
+                        }
+                    }
+                    else
+                    {
+                        <a class="btn btn-outline-light btn-sm" href="@Url.Action("Login", "Account")">Đăng nhập</a>
+                        <a class="btn btn-warning btn-sm text-dark" href="@Url.Action("Register", "Account")">Đăng ký</a>
+                    }
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid body-content py-4 px-3 px-lg-4">
+        <div class="row g-4">
+            @if (Request.IsAuthenticated && isAdminOrManager)
+            {
+                <aside class="col-12 col-lg-3 col-xl-2">
+                    <div class="admin-sidebar card shadow-sm h-100">
+                        <div class="card-body p-3">
+                            <h2 class="h6 text-uppercase text-muted mb-3">Menu quản trị</h2>
+                            <div class="list-group list-group-flush admin-nav-list">
+                                <a class="list-group-item list-group-item-action" href="@Url.Action("Dashboard", "Home")">Bảng điều khiển</a>
+                                <a class="list-group-item list-group-item-action" href="@Url.Action("Index", "UserAdmin")">Người dùng</a>
+                                <a class="list-group-item list-group-item-action" href="@Url.Action("Index", "AdminProducts")">Sản phẩm</a>
+                                <a class="list-group-item list-group-item-action" href="@Url.Action("Index", "AdminOrders")">Đơn hàng</a>
+                                <a class="list-group-item list-group-item-action" href="@Url.Action("Index", "Sales")">Bán hàng</a>
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <a class="list-group-item list-group-item-action" href="@Url.Action("AdminPanel", "Home")">Khu vực admin</a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+                <section class="col-12 col-lg-9 col-xl-10">
+                    <div class="admin-content card shadow-sm">
+                        <div class="card-body p-3 p-lg-4">
+                            @if (TempData["StatusMessage"] != null)
+                            {
+                                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                    @TempData["StatusMessage"]
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            }
+                            @RenderBody()
+                        </div>
+                    </div>
+                </section>
+            }
+            else
+            {
+                <section class="col-12">
+                    @if (TempData["StatusMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            @TempData["StatusMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+                    @RenderBody()
+                </section>
+            }
+        </div>
+
+        <footer class="border-top pt-3 mt-4 text-muted small">
+            <p class="mb-0">&copy; @DateTime.Now.Year - Hệ thống Quản trị Shop</p>
+        </footer>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>
+

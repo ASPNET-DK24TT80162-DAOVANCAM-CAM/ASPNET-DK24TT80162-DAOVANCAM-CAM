@@ -1,0 +1,38 @@
+﻿<div class="announce">Miễn phí giao hàng từ 800.000 VNĐ - Đổi size miễn phí 30 ngày - Hotline 1900 6868</div>
+<nav class="navbar-shop">
+    <div class="container d-flex align-items-center justify-content-between gap-3">
+        <div class="d-flex align-items-center gap-4">
+            <a href="@Url.Action("Index", "Home")" class="brand">STRIDE</a>
+            <ul class="navbar-nav d-none d-lg-flex flex-row">
+                <li class="nav-item"><a class="nav-link" href="@Url.Action("Products", "Store", new { gender = "Men" })">Nam</a></li>
+                <li class="nav-item"><a class="nav-link" href="@Url.Action("Products", "Store", new { gender = "Women" })">Nữ</a></li>
+                <li class="nav-item"><a class="nav-link" href="@Url.Action("Products", "Store")">Tất cả sản phẩm</a></li>
+                <li class="nav-item"><a class="nav-link" href="@Url.Action("Index", "Wishlist")">Yêu thích</a></li>
+            </ul>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <a href="@Url.Action("Index", "Orders")" class="icon-link d-none d-md-inline-flex">Đơn hàng của tôi</a>
+            @if (Request.IsAuthenticated)
+            {
+                if (User.IsInRole("Admin"))
+                {
+                    <a href="@Url.Action("Dashboard", "Home")" class="icon-link d-none d-lg-inline-flex">Dashboard Admin</a>
+                }
+                <span class="icon-link d-none d-md-inline-flex">Welcome, @User.Identity.Name</span>
+                <a href="@Url.Action("Profile", "Account")" class="icon-link">Mở Profile</a>
+                <a href="@Url.Action("Index", "Cart")" class="icon-link"><strong>Giỏ hàng</strong></a>
+                using (Html.BeginForm("Logout", "Account", FormMethod.Post, new { @class = "d-inline-block" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-sm btn-light-line">Đăng xuất</button>
+                }
+            }
+            else
+            {
+                <a href="@Url.Action("Login", "Account")" class="icon-link">Đăng nhập</a>
+                <a href="@Url.Action("Register", "Account")" class="icon-link"><strong>Đăng ký</strong></a>
+            }
+        </div>
+    </div>
+</nav>
+

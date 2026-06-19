@@ -1,0 +1,93 @@
+﻿@model ShopManagement.Models.AppUser
+
+@{
+    ViewBag.Title = "B\u1EA3ng \u0111i\u1EC1u khi\u1EC3n";
+    Layout = "~/Views/Shared/_ShopLayout.cshtml";
+}
+
+<div class="page-header">
+    <h1 class="h3 mb-2">Bảng điều khiển</h1>
+    <p class="text-muted mb-0">Đang đăng nhập với @(Model != null ? Model.FullName : User.Identity.Name).</p>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="card dashboard-card h-100">
+            <div class="card-body">
+                <h2 class="h5">Thông tin tài khoản</h2>
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Vai trò</dt>
+                    <dd class="col-sm-8">@(Model != null && Model.Role != null ? Model.Role.Name : "Kh\u00F4ng r\u00F5")</dd>
+                    <dt class="col-sm-4">Email</dt>
+                    <dd class="col-sm-8">@(Model != null ? Model.Email : User.Identity.Name)</dd>
+                    <dt class="col-sm-4">Điện thoại</dt>
+                    <dd class="col-sm-8">@(Model != null ? Model.PhoneNumber : "-")</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <div class="card dashboard-card h-100">
+            <div class="card-body">
+                <h2 class="h5">Truy cập nhanh</h2>
+                <div class="d-flex flex-wrap gap-2 mt-3 mb-3">
+                    <a href="@Url.Action("Profile", "Account")" class="btn btn-dark">Hồ sơ của tôi</a>
+                    <a href="@Url.Action("ChangePassword", "Account")" class="btn btn-outline-secondary">Đổi mật khẩu</a>
+                    <a href="@Url.Action("CustomerPanel", "Home")" class="btn btn-outline-dark">Khu vực khách hàng</a>
+                </div>
+
+                @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                {
+                    <h3 class="h6 text-uppercase text-muted mb-3">Ứng dụng quản trị</h3>
+                    <div class="d-flex gap-3 pb-1" style="overflow-x:auto; white-space:nowrap;">
+                        <a href="@Url.Action("Dashboard", "Home")" class="text-decoration-none text-dark">
+                            <div class="border rounded-3 p-3 text-center" style="width:130px;">
+                                <div class="fw-semibold">Dashboard</div>
+                                <div class="small text-muted">Tổng quan</div>
+                            </div>
+                        </a>
+                        <a href="@Url.Action("Index", "UserAdmin")" class="text-decoration-none text-dark">
+                            <div class="border rounded-3 p-3 text-center" style="width:130px;">
+                                <div class="fw-semibold">Users</div>
+                                <div class="small text-muted">Người dùng</div>
+                            </div>
+                        </a>
+                        <a href="@Url.Action("Index", "AdminProducts")" class="text-decoration-none text-dark">
+                            <div class="border rounded-3 p-3 text-center" style="width:130px;">
+                                <div class="fw-semibold">Products</div>
+                                <div class="small text-muted">Sản phẩm</div>
+                            </div>
+                        </a>
+                        <a href="@Url.Action("Index", "AdminOrders")" class="text-decoration-none text-dark">
+                            <div class="border rounded-3 p-3 text-center" style="width:130px;">
+                                <div class="fw-semibold">Orders</div>
+                                <div class="small text-muted">Đơn hàng</div>
+                            </div>
+                        </a>
+                        <a href="@Url.Action("Index", "Sales")" class="text-decoration-none text-dark">
+                            <div class="border rounded-3 p-3 text-center" style="width:130px;">
+                                <div class="fw-semibold">Sales</div>
+                                <div class="small text-muted">Bán hàng</div>
+                            </div>
+                        </a>
+                        <a href="@Url.Action("ManagerPanel", "Home")" class="text-decoration-none text-dark">
+                            <div class="border rounded-3 p-3 text-center" style="width:130px;">
+                                <div class="fw-semibold">Manager</div>
+                                <div class="small text-muted">Khu vực quản lý</div>
+                            </div>
+                        </a>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a href="@Url.Action("AdminPanel", "Home")" class="text-decoration-none text-dark">
+                                <div class="border rounded-3 p-3 text-center bg-warning-subtle" style="width:130px;">
+                                    <div class="fw-semibold">Admin</div>
+                                    <div class="small text-muted">Khu vực admin</div>
+                                </div>
+                            </a>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

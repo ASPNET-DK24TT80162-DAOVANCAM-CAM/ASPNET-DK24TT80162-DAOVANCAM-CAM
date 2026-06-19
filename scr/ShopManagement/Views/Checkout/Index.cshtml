@@ -1,0 +1,84 @@
+﻿@model ShopManagement.Models.CheckoutViewModel
+@using System.Linq
+
+@{
+    ViewBag.Title = "Thanh toán";
+    Layout = "~/Views/Shared/_ShopLayout.cshtml";
+    var hasStockIssue = Model.Items.Any(item => item.Quantity > item.ProductVariant.StockQuantity);
+}
+
+<div class="page-header">
+    <h1 class="h3 mb-1">Thanh toán</h1>
+    <p class="text-muted mb-0">Xác nhận thông tin nhận hàng và đặt đơn.</p>
+</div>
+
+@if (hasStockIssue)
+{
+    <div class="alert alert-warning">
+        Một số sản phẩm đã thay đổi tồn kho. Vui lòng cập nhật lại giỏ hàng trước khi đặt đơn.
+        <a href="@Url.Action("Index", "Cart")" class="alert-link ms-2">Về giỏ hàng</a>
+    </div>
+}
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="card form-card p-4">
+                <div class="mb-3">
+                    @Html.LabelFor(model => model.ReceiverName, new { @class = "form-label" })
+                    @Html.TextBoxFor(model => model.ReceiverName, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.ReceiverName, "", new { @class = "text-danger small" })
+                </div>
+                <div class="mb-3">
+                    @Html.LabelFor(model => model.PhoneNumber, new { @class = "form-label" })
+                    @Html.TextBoxFor(model => model.PhoneNumber, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.PhoneNumber, "", new { @class = "text-danger small" })
+                </div>
+                <div class="mb-3">
+                    @Html.LabelFor(model => model.ShippingAddress, new { @class = "form-label" })
+                    @Html.TextAreaFor(model => model.ShippingAddress, new { @class = "form-control", rows = 3 })
+                    @Html.ValidationMessageFor(model => model.ShippingAddress, "", new { @class = "text-danger small" })
+                </div>
+                <div class="mb-3">
+                    @Html.LabelFor(model => model.Note, new { @class = "form-label" })
+                    @Html.TextAreaFor(model => model.Note, new { @class = "form-control", rows = 3 })
+                </div>
+                <div class="mb-3">
+                    @Html.LabelFor(model => model.PaymentMethod, new { @class = "form-label" })
+                    <select name="PaymentMethod" class="form-select">
+                        <option value="COD" @(Model.PaymentMethod == "COD" ? "selected" : "")>Thanh toán khi nhận hàng (COD)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="card form-card p-4">
+                <h2 class="h5 mb-3">Tóm tắt đơn hàng</h2>
+                @foreach (var item in Model.Items)
+                {
+                    <div class="d-flex justify-content-between small mb-2">
+                        <span>@item.ProductVariant.Product.Name (@item.ProductVariant.Color.Name/@item.ProductVariant.Size.Name) x @item.Quantity</span>
+                        <span>@(item.Quantity * item.UnitPrice).ToString("N0")</span>
+                    </div>
+                    if (item.Quantity > item.ProductVariant.StockQuantity)
+                    {
+                        <div class="text-danger small mb-2">Tồn kho còn @item.ProductVariant.StockQuantity cho @item.ProductVariant.Product.Name.</div>
+                    }
+                }
+                <hr />
+                <div class="d-flex justify-content-between"><span>Tạm tính</span><strong>@Model.Subtotal.ToString("N0")</strong></div>
+                <div class="d-flex justify-content-between"><span>Phí vận chuyển</span><strong>@Model.ShippingFee.ToString("N0")</strong></div>
+                <div class="d-flex justify-content-between mt-2"><span>Tổng cộng</span><strong>@Model.Total.ToString("N0") VNĐ</strong></div>
+                <button type="submit" class="btn btn-dark w-100 mt-3" @(hasStockIssue ? "disabled" : "")>Đặt hàng</button>
+            </div>
+        </div>
+    </div>
+}
+
+@section scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

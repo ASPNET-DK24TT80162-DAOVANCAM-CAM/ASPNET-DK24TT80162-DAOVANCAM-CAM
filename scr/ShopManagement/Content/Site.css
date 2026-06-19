@@ -1,0 +1,123 @@
+﻿:root {
+    --app-bg: #f3efe6;
+    --app-surface: #fffdf8;
+    --app-ink: #1f2933;
+    --app-accent: #9f5f2e;
+    --app-accent-soft: #e8d7c4;
+}
+
+body {
+    background: radial-gradient(circle at top, #fff8ee 0%, var(--app-bg) 50%, #ece4d7 100%);
+    color: var(--app-ink);
+}
+
+.app-shell {
+    min-height: 100vh;
+}
+
+.app-nav {
+    background: linear-gradient(135deg, #1f2933 0%, #34414f 100%);
+}
+
+.app-topbar {
+    align-items: center;
+}
+
+.app-nav .navbar-nav {
+    align-items: center;
+    gap: 0.15rem;
+}
+
+.app-nav .nav-link {
+    border-radius: 999px;
+    padding: 0.45rem 0.85rem;
+    font-weight: 500;
+}
+
+.app-nav .nav-link:hover,
+.app-nav .nav-link:focus {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.app-auth-actions {
+    white-space: nowrap;
+}
+
+.body-content {
+    margin-top: 1.5rem;
+}
+
+.admin-sidebar {
+    background: #fff;
+    border: 1px solid rgba(159, 95, 46, 0.16);
+    border-radius: 1rem;
+}
+
+.admin-nav-list .list-group-item {
+    border: 0;
+    border-radius: 0.7rem !important;
+    margin-bottom: 0.25rem;
+    font-weight: 500;
+    color: var(--app-ink);
+}
+
+.admin-nav-list .list-group-item:hover,
+.admin-nav-list .list-group-item:focus {
+    background: rgba(159, 95, 46, 0.12);
+    color: #633814;
+}
+
+.admin-content {
+    background: var(--app-surface);
+    border: 1px solid rgba(159, 95, 46, 0.14);
+    border-radius: 1rem;
+}
+
+.hero-card {
+    background: linear-gradient(135deg, rgba(255, 248, 238, 0.96) 0%, rgba(232, 215, 196, 0.88) 100%);
+    border: 1px solid rgba(159, 95, 46, 0.12);
+    border-radius: 1.5rem;
+    box-shadow: 0 1rem 2rem rgba(31, 41, 51, 0.08);
+}
+
+.form-card,
+.dashboard-card {
+    background-color: var(--app-surface);
+    border: 0;
+    border-radius: 1rem;
+    box-shadow: 0 1rem 2rem rgba(31, 41, 51, 0.08);
+}
+
+.table > :not(caption) > * > * {
+    padding-top: 0.9rem;
+    padding-bottom: 0.9rem;
+}
+
+input.form-control,
+select.form-select,
+textarea.form-control {
+    max-width: none;
+}
+
+.role-badge {
+    min-width: 92px;
+}
+
+.page-header {
+    margin-bottom: 1.5rem;
+}
+
+.text-accent {
+    color: var(--app-accent);
+}
+
+@media (max-width: 991.98px) {
+    .app-nav .navbar-nav {
+        align-items: flex-start;
+    }
+
+    .app-auth-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+}

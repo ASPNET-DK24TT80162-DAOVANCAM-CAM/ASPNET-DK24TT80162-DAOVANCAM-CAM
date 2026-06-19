@@ -1,0 +1,70 @@
+@model ShopManagement.Models.RegisterViewModel
+
+@{
+    ViewBag.Title = "Dang ky";
+    Layout = "~/Views/Shared/_ShopLayout.cshtml";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card form-card">
+            <div class="card-body p-4 p-lg-5">
+                <h1 class="h3 mb-3">Dang ky tai khoan khach hang</h1>
+                <p class="text-muted">Tai khoan moi mac dinh thuoc nhom Customer.</p>
+
+                @using (Html.BeginForm())
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            @Html.LabelFor(model => model.FullName, new { @class = "form-label" })
+                            @Html.TextBoxFor(model => model.FullName, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.FullName, "", new { @class = "text-danger small" })
+                        </div>
+                        <div class="col-md-6">
+                            @Html.LabelFor(model => model.PhoneNumber, new { @class = "form-label" })
+                            @Html.TextBoxFor(model => model.PhoneNumber, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.PhoneNumber, "", new { @class = "text-danger small" })
+                        </div>
+                        <div class="col-md-6">
+                            @Html.LabelFor(model => model.Email, new { @class = "form-label" })
+                            @Html.TextBoxFor(model => model.Email, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger small" })
+                        </div>
+                        <div class="col-md-6">
+                            @Html.LabelFor(model => model.CitizenId, new { @class = "form-label" })
+                            @Html.TextBoxFor(model => model.CitizenId, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.CitizenId, "", new { @class = "text-danger small" })
+                        </div>
+                        <div class="col-12">
+                            @Html.LabelFor(model => model.Address, new { @class = "form-label" })
+                            @Html.TextAreaFor(model => model.Address, new { @class = "form-control", rows = 3 })
+                            @Html.ValidationMessageFor(model => model.Address, "", new { @class = "text-danger small" })
+                        </div>
+                        <div class="col-md-6">
+                            @Html.LabelFor(model => model.Password, new { @class = "form-label" })
+                            @Html.PasswordFor(model => model.Password, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger small" })
+                        </div>
+                        <div class="col-md-6">
+                            @Html.LabelFor(model => model.ConfirmPassword, new { @class = "form-label" })
+                            @Html.PasswordFor(model => model.ConfirmPassword, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.ConfirmPassword, "", new { @class = "text-danger small" })
+                        </div>
+                    </div>
+
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-dark">Tao tai khoan</button>
+                        @Html.ActionLink("Quay lai dang nhap", "Login", "Account", null, new { @class = "btn btn-outline-secondary" })
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

@@ -1,0 +1,72 @@
+﻿@model ShopManagement.Models.UserEditViewModel
+
+@{
+    ViewBag.Title = "S\u1EEDa ng\u01B0\u1EDDi d\u00F9ng";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card form-card">
+            <div class="card-body p-4 p-lg-5">
+                <h1 class="h3 mb-3">Sửa người dùng</h1>
+                <p class="text-muted">Admin có thể cập nhật hồ sơ, kích hoạt hoặc khóa tài khoản, và thay đổi vai trò.</p>
+
+                @using (Html.BeginForm())
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.HiddenFor(model => model.Id)
+                    @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label" for="FullName">Họ và tên</label>
+                            @Html.TextBoxFor(model => model.FullName, new { @class = "form-control", placeholder = "Nhập họ và tên" })
+                            @Html.ValidationMessageFor(model => model.FullName, "", new { @class = "text-danger small" })
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="PhoneNumber">Số điện thoại</label>
+                            @Html.TextBoxFor(model => model.PhoneNumber, new { @class = "form-control", placeholder = "Nhập số điện thoại" })
+                            @Html.ValidationMessageFor(model => model.PhoneNumber, "", new { @class = "text-danger small" })
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="Email">Email</label>
+                            @Html.TextBoxFor(model => model.Email, new { @class = "form-control", placeholder = "Nhập email" })
+                            @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger small" })
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="CitizenId">CCCD</label>
+                            @Html.TextBoxFor(model => model.CitizenId, new { @class = "form-control", placeholder = "Nhập CCCD" })
+                            @Html.ValidationMessageFor(model => model.CitizenId, "", new { @class = "text-danger small" })
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" for="Address">Địa chỉ</label>
+                            @Html.TextAreaFor(model => model.Address, new { @class = "form-control", rows = 3, placeholder = "Nhập địa chỉ" })
+                            @Html.ValidationMessageFor(model => model.Address, "", new { @class = "text-danger small" })
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="RoleId">Vai trò</label>
+                            @Html.DropDownList("RoleId", null, new { @class = "form-select" })
+                            @Html.ValidationMessageFor(model => model.RoleId, "", new { @class = "text-danger small" })
+                        </div>
+                        <div class="col-md-6 d-flex align-items-end">
+                            <div class="form-check mb-2">
+                                @Html.CheckBoxFor(model => model.IsActive, new { @class = "form-check-input" })
+                                <label class="form-check-label" for="IsActive">Kích hoạt tài khoản</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-dark">Lưu thay đổi</button>
+                        <a href="@Url.Action("Index", "UserAdmin")" class="btn btn-outline-secondary">Quay lại</a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+

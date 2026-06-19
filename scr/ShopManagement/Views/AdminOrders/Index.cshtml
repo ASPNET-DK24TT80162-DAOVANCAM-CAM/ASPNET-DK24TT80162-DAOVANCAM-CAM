@@ -1,0 +1,60 @@
+﻿@model IEnumerable<ShopManagement.Models.Order>
+
+@{
+    ViewBag.Title = "Qu\u1EA3n l\u00FD \u0111\u01A1n h\u00E0ng";
+}
+
+<div class="page-header">
+    <h1 class="h3 mb-1">Quản lý đơn hàng</h1>
+    <p class="text-muted mb-0">Theo dõi đơn và cập nhật trạng thái xử lý.</p>
+</div>
+
+@using (Html.BeginForm("Index", "AdminOrders", FormMethod.Get, new { @class = "card form-card p-3 mb-3" }))
+{
+    <div class="row g-2">
+        <div class="col-md-4"><input class="form-control" name="keyword" value="@ViewBag.Keyword" placeholder="Mã đơn, người nhận, số điện thoại" /></div>
+        <div class="col-md-4">
+            <select name="status" class="form-select">
+                <option value="">Tất cả trạng thái</option>
+                @foreach (var status in (IList<string>)ViewBag.StatusOptions)
+                {
+                    <option value="@status" @(status == (string)ViewBag.Status ? "selected" : "")>@status</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2 d-grid"><button class="btn btn-outline-dark" type="submit">Lọc</button></div>
+    </div>
+}
+
+<div class="card dashboard-card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Đơn hàng</th>
+                        <th>Khách hàng</th>
+                        <th>Ngày tạo</th>
+                        <th>Trạng thái</th>
+                        <th>Tổng tiền</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.OrderCode</td>
+                            <td>@item.ReceiverName</td>
+                            <td>@item.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td><span class="badge text-bg-secondary">@item.OrderStatus</span></td>
+                            <td>@item.TotalAmount.ToString("N0") VNĐ</td>
+                            <td>@Html.ActionLink("Chi tiết", "Details", new { id = item.Id }, new { @class = "btn btn-sm btn-outline-dark" })</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+

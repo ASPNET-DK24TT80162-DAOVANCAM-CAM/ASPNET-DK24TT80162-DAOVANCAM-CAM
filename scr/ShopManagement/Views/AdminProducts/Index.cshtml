@@ -1,0 +1,61 @@
+﻿@model IEnumerable<ShopManagement.Models.Product>
+
+@{
+    ViewBag.Title = "Qu\u1EA3n l\u00FD s\u1EA3n ph\u1EA9m";
+}
+
+<div class="page-header d-flex justify-content-between align-items-center">
+    <div>
+        <h1 class="h3 mb-1">Quản lý sản phẩm</h1>
+        <p class="text-muted mb-0">Quản lý danh mục sản phẩm và truy cập nhanh quản lý biến thể tồn kho.</p>
+    </div>
+    <a href="@Url.Action("Create", "AdminProducts")" class="btn btn-dark">Tạo sản phẩm</a>
+</div>
+
+@using (Html.BeginForm("Index", "AdminProducts", FormMethod.Get, new { @class = "card form-card p-3 mb-3" }))
+{
+    <div class="row g-2">
+        <div class="col-md-4"><input class="form-control" name="keyword" value="@ViewBag.Keyword" placeholder="Tìm theo tên hoặc SKU" /></div>
+        <div class="col-md-3">@Html.DropDownList("brandId", (SelectList)ViewBag.BrandId, "Tất cả thương hiệu", new { @class = "form-select" })</div>
+        <div class="col-md-3">@Html.DropDownList("categoryId", (SelectList)ViewBag.CategoryId, "Tất cả danh mục", new { @class = "form-select" })</div>
+        <div class="col-md-2"><button class="btn btn-outline-dark w-100" type="submit">Lọc</button></div>
+    </div>
+}
+
+<div class="card dashboard-card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>SKU</th>
+                        <th>Tên</th>
+                        <th>Thương hiệu/Danh mục</th>
+                        <th>Giá</th>
+                        <th>Trạng thái</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Sku</td>
+                            <td>@item.Name</td>
+                            <td>@item.Brand.Name / @item.Category.Name</td>
+                            <td>@((item.SalePrice ?? item.BasePrice).ToString("N0"))</td>
+                            <td><span class="badge @(item.IsActive ? "text-bg-success" : "text-bg-secondary")">@(item.IsActive ? "Đang hiển thị" : "Đang ẩn")</span></td>
+                            <td class="text-end">
+                                <div class="d-flex justify-content-end gap-2">
+                                    @Html.ActionLink("Sửa", "Edit", new { id = item.Id }, new { @class = "btn btn-sm btn-outline-dark" })
+                                    @Html.ActionLink("Biến thể", "Variants", new { productId = item.Id }, new { @class = "btn btn-sm btn-dark" })
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+

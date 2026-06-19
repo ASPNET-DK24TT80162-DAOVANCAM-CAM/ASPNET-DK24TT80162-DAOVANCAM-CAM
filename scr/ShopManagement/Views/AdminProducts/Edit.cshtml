@@ -1,0 +1,22 @@
+﻿@model ShopManagement.Models.Product
+
+@{
+    ViewBag.Title = "S\u1EEDa s\u1EA3n ph\u1EA9m";
+}
+
+<div class="page-header d-flex justify-content-between align-items-center">
+    <h1 class="h3 mb-1">Sửa sản phẩm</h1>
+    <a href="@Url.Action("Variants", "AdminProducts", new { productId = Model.Id })" class="btn btn-dark">Quản lý biến thể</a>
+</div>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.Id)
+    @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+    @Html.Partial("_ProductForm", Model)
+}
+
+@section scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
